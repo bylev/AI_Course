@@ -10,7 +10,7 @@ from io import BytesIO
 import pyttsx3
 from IPython.display import Audio
 
-openai.api_key  = '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'
+openai.api_key  = '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'
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
     messages = [{"role": "user", "content": prompt}]
@@ -19,6 +19,7 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
         messages=messages,
         temperature=0,
     )
+    return response.choices[0].message["content"]
 def text_to_speech(text):
     engine = pyttsx3.init()
     with tempfile.NamedTemporaryFile(delete=True) as temp_audio:
@@ -52,9 +53,8 @@ def main():
     else:
         st.write("No se ha proporcionado ningún audio.")
 
-    model = whisper.load_model("base")
     if result is not None:
-        prompt = f"Responde esto: '{result}'"
+        prompt = f"Respondeme este texto: {result['text']}"
         response = get_completion(prompt)
         st.write(response)
 
