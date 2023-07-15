@@ -5,9 +5,11 @@ from audio_recorder_streamlit import audio_recorder
 import whisper
 import tempfile
 import pyttsx3
-
+import pandas as pd
 # Set up your OpenAI API credentials
-openai.api_key = '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'
+openai.api_key = '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'
+
+
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
     messages = [{"role": "user", "content": prompt}]
@@ -18,6 +20,7 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
     )
     return response.choices[0].message["content"]
 
+embeddings = f"""All tourist places to go in Merida by the information of what you have"""
 def text_to_speech(text):
     engine = pyttsx3.init()
     with tempfile.NamedTemporaryFile(delete=True) as temp_audio:
@@ -86,13 +89,13 @@ if audio_path is not None:
     model = whisper.load_model("base")
     result = model.transcribe(audio)
 else:
-    st.write("No se ha proporcionado ningún audio.")
+    st.write("Hello, I am your tourism guide, how can I help you?")
 
 if result is not None:
     foreigner_input = result["text"]
     foreign_language = detect_language(foreigner_input)
-
-    response = get_completion(foreigner_input)
+    prompt = f"""Respond this {foreigner_input} with the information of ´´{embeddings}´´ """
+    response = get_completion(prompt)
 
     # Translate local support's input to foreigner's language
     foreigner_message = translate_text(response, foreign_language)
@@ -104,6 +107,11 @@ if result is not None:
     audio_data = text_to_speech(foreigner_display)
     st.audio(audio_data, format="audio/wav")
 else:
-    st.write("No se ha proporcionado ningún texto de entrada.")
+    st.write("Write your questions without pity")
 
 foreigner_input = st.text_input("Texto del usuario extranjero")
+
+
+
+
+ 
