@@ -7,8 +7,10 @@ import tempfile
 from PIL import Image
 import requests
 from io import BytesIO
+import pyttsx3
+from IPython.display import Audio
 
-openai.api_key  = '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'
+openai.api_key  = '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'
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
     messages = [{"role": "user", "content": prompt}]
@@ -17,6 +19,14 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
         messages=messages,
         temperature=0,
     )
+def text_to_speech(text):
+    engine = pyttsx3.init()
+    with tempfile.NamedTemporaryFile(delete=True) as temp_audio:
+        temp_audio_path = temp_audio.name + ".wav"
+        engine.save_to_file(text, temp_audio_path)
+        engine.runAndWait()
+        audio_data = open(temp_audio_path, "rb").read()
+        return audio_data
 def main(): 
     st.title("Oral Essay")
     audio_bytes = audio_recorder()
@@ -33,7 +43,7 @@ def main():
     else:
             audio = None
 
-
+    result = None
     # Cargar el modelo Whisper
     model = whisper.load_model("base")
     if audio is not None:
@@ -43,8 +53,15 @@ def main():
         st.write("No se ha proporcionado ningún audio.")
 
     model = whisper.load_model("base")
+    if result is not None:
+        prompt = f"Responde esto: '{result}'"
+        response = get_completion(prompt)
+        st.write(response)
 
-
-    
+        audio_data = text_to_speech(response)
+        st.audio(audio_data, format="audio/wav")
+    else:
+        st.write("No se ha proporcionado ningún texto de entrada.")
+ 
 if __name__ == "__main__":
     main()
